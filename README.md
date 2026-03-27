@@ -25,10 +25,3 @@ El proyecto integra un flujo de trabajo completo de análisis de datos:
 * `proyecto_tic.db`: Base de datos relacional (SQLite) que contiene las tablas `Fact_Interacciones`, `Dim_Usuarios`, `Dim_Agentes` y `Dim_Tipo_Incidencia`.
 * `requirements.txt`: Archivo de dependencias necesarias para el despliegue en Streamlit Community Cloud.
 * `README.md`: Documentación principal del proyecto.
-
-## 🚀 Cómo ejecutar el proyecto localmente
-Si deseas correr este dashboard en tu máquina local, sigue estos pasos:
-
-1. Clona este repositorio:
-   ```bash
-   git clone [https://github.com/TuUsuario/Proyecto-Analisis-TIC.git](https://github.com/TuUsuario/Proyecto-Analisis-TIC.git)
