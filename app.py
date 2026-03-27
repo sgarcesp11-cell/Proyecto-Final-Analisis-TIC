@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import sqlite3
 import plotly.express as px
-import plotly.graph_objects as go
 
 # -------------------------------------------------------------------------
 # 1. CONFIGURACIÓN DE PÁGINA Y ESTILOS
@@ -16,11 +15,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("📡 Control Tower: Análisis de Reincidencia TIC")
-st.markdown("Plataforma interactiva para el monitoreo de resolución en primer contacto (FCR) y comportamiento de re-llamadas. Proyecto Final Talento Tech.")
+st.markdown("Plataforma interactiva para el monitoreo de FCR, comportamiento de re-llamadas y rendimiento de asesores.")
 st.markdown("---")
 
 # -------------------------------------------------------------------------
-# 2. CARGA Y PREPARACIÓN DE DATOS (CON INGENIERÍA DE CARACTERÍSTICAS)
+# 2. CARGA Y PREPARACIÓN DE DATOS 
 # -------------------------------------------------------------------------
 @st.cache_data
 def load_data():
@@ -28,7 +27,7 @@ def load_data():
     query = """
         SELECT 
             f.id_interaccion, f.fecha_hora, u.plan_servicio, a.nivel_experiencia,
-            a.turno, t.categoria, t.prioridad, f.duracion_segundos,
+            a.turno, a.nombre AS nombre_agente, t.categoria, t.prioridad, f.duracion_segundos,
             f.resuelta_en_primera_llamada, f.es_rellamada,
             CASE 
                 WHEN u.fecha_registro >= '2025-01-01' THEN 'A: Clientes nuevos'
@@ -44,14 +43,18 @@ def load_data():
     df = pd.read_sql_query(query, conn)
     conn.close()
     
-    # Preparar fechas y extraer componentes para los Heatmaps
+    # Preparar fechas
     df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
     df['fecha_dia'] = df['fecha_hora'].dt.date
     df['hora'] = df['fecha_hora'].dt.hour
     
-    # Mapear los días de la semana a español
     dias_semana = {0: '1-Lunes', 1: '2-Martes', 2: '3-Miércoles', 3: '4-Jueves', 4: '5-Viernes', 5: '6-Sábado', 6: '7-Domingo'}
     df['dia_semana'] = df['fecha_hora'].dt.dayofweek.map(dias_semana)
+    
+    # Mapear Meses
+    meses_dict = {1:'01-Ene', 2:'02-Feb', 3:'03-Mar', 4:'04-Abr', 5:'05-May', 6:'06-Jun', 
+                  7:'07-Jul', 8:'08-Ago', 9:'09-Sep', 10:'10-Oct', 11:'11-Nov', 12:'12-Dic'}
+    df['mes'] = df['fecha_hora'].dt.month.map(meses_dict)
     
     return df
 
@@ -63,12 +66,15 @@ df = load_data()
 st.sidebar.image("https://cdn-icons-png.flaticon.com/512/8633/8633190.png", width=120)
 st.sidebar.header("🎯 Segmentación Dinámica")
 
+# Nuevos filtros incluyendo el Mes
+meses = st.sidebar.multiselect("📅 Mes de Operación:", options=sorted(df['mes'].unique()), default=sorted(df['mes'].unique()))
 turnos = st.sidebar.multiselect("⌚ Turno Operativo:", options=df['turno'].unique(), default=df['turno'].unique())
 experiencia = st.sidebar.multiselect("🎖️ Nivel de Experiencia:", options=df['nivel_experiencia'].unique(), default=df['nivel_experiencia'].unique())
 prioridad = st.sidebar.multiselect("🚨 Prioridad del Caso:", options=df['prioridad'].unique(), default=df['prioridad'].unique())
 
 # Aplicar filtros
 df_filtrado = df[
+    (df['mes'].isin(meses)) &
     (df['turno'].isin(turnos)) & 
     (df['nivel_experiencia'].isin(experiencia)) & 
     (df['prioridad'].isin(prioridad))
@@ -94,42 +100,34 @@ else:
     st.markdown("<br>", unsafe_allow_html=True)
 
     # -------------------------------------------------------------------------
-    # 5. TABS DE ANÁLISIS
+    # 5. TABS DE ANÁLISIS (AHORA CON 4 PESTAÑAS)
     # -------------------------------------------------------------------------
-    tab1, tab2, tab3 = st.tabs(["🔥 Mapas de Calor (Heatmaps)", "📈 Análisis General", "📋 Base de Datos"])
+    tab1, tab2, tab3, tab4 = st.tabs(["🔥 Mapas de Calor", "📈 Análisis General", "👥 Análisis de Asesores", "📋 Base de Datos"])
 
     with tab1:
         st.subheader("Análisis de Saturación y Riesgo Operativo")
-        st.markdown("Identifica los cuellos de botella cruzando variables de tiempo, experiencia y tipología.")
-        
-        # 1. Heatmap: Día vs Hora de las Reincidencias
         st.markdown("**1. Mapa de Calor: Re-llamadas por Día y Hora**")
         df_rellamadas = df_filtrado[df_filtrado['es_rellamada'] == 1]
         hm_dia_hora = df_rellamadas.groupby(['dia_semana', 'hora']).size().reset_index(name='volumen')
         fig_hm1 = px.density_heatmap(hm_dia_hora, x='hora', y='dia_semana', z='volumen', 
-                                     color_continuous_scale='Inferno', text_auto=True,
-                                     labels={'hora':'Hora del Día', 'dia_semana':'Día de la Semana'})
-        fig_hm1.update_yaxes(categoryorder='category descending') # Ordenar días correctamente
+                                     color_continuous_scale='Inferno', text_auto=True)
+        fig_hm1.update_yaxes(categoryorder='category descending') 
         st.plotly_chart(fig_hm1, use_container_width=True)
         
         c1, c2 = st.columns(2)
         with c1:
-            # 2. Heatmap: Día vs Experiencia
             st.markdown("**2. Mapa de Calor: Volumen por Día y Experiencia**")
             hm_dia_exp = df_filtrado.groupby(['dia_semana', 'nivel_experiencia']).size().reset_index(name='volumen')
             fig_hm2 = px.density_heatmap(hm_dia_exp, x='nivel_experiencia', y='dia_semana', z='volumen',
-                                         color_continuous_scale='Blues', text_auto=True,
-                                         labels={'nivel_experiencia':'Nivel de Experiencia', 'dia_semana':'Día de la Semana'})
+                                         color_continuous_scale='Blues', text_auto=True)
             fig_hm2.update_yaxes(categoryorder='category descending')
             st.plotly_chart(fig_hm2, use_container_width=True)
             
         with c2:
-            # 3. Heatmap: Tipo de Incidencia vs Hora
             st.markdown("**3. Mapa de Calor: Tipo de Incidencia vs Hora del Día**")
             hm_inc_hora = df_filtrado.groupby(['categoria', 'hora']).size().reset_index(name='volumen')
             fig_hm3 = px.density_heatmap(hm_inc_hora, x='hora', y='categoria', z='volumen',
-                                         color_continuous_scale='Viridis', text_auto=True,
-                                         labels={'hora':'Hora del Día', 'categoria':'Tipo de Incidencia'})
+                                         color_continuous_scale='Viridis', text_auto=True)
             st.plotly_chart(fig_hm3, use_container_width=True)
 
     with tab2:
@@ -144,9 +142,46 @@ else:
                           title="Dispersión del TMO por Segmento", template="plotly_white")
             st.plotly_chart(fig_box, use_container_width=True)
             
-        df_tendencia = df_filtrado.groupby('fecha_dia')['es_rellamada'].sum().reset_index()
-        fig_line = px.line(df_tendencia, x='fecha_dia', y='es_rellamada', title="Evolución Anual de Re-llamadas Diarias", template="plotly_white")
+        df_tendencia = df_filtrado.groupby('mes')['es_rellamada'].sum().reset_index()
+        fig_line = px.bar(df_tendencia, x='mes', y='es_rellamada', title="Evolución Mensual de Re-llamadas", template="plotly_white", text_auto=True)
         st.plotly_chart(fig_line, use_container_width=True)
 
+    # NUEVA PESTAÑA DE ASESORES
     with tab3:
+        st.subheader("Rendimiento Individual por Asesor")
+        st.markdown("Identifica oportunidades de mejora cruzando el tiempo invertido frente a la efectividad.")
+        
+        # Agrupar métricas por asesor
+        df_agentes = df_filtrado.groupby(['nombre_agente', 'nivel_experiencia']).agg(
+            total_llamadas=('id_interaccion', 'count'),
+            tmo_promedio=('duracion_segundos', 'mean'),
+            total_rellamadas=('es_rellamada', 'sum')
+        ).reset_index()
+        
+        df_agentes['tasa_rellamada'] = (df_agentes['total_rellamadas'] / df_agentes['total_llamadas']) * 100
+        df_agentes['tmo_promedio_min'] = df_agentes['tmo_promedio'] / 60
+        
+        c5, c6 = st.columns(2)
+        with c5:
+            # Matriz de Desempeño
+            fig_scatter = px.scatter(df_agentes, x='tmo_promedio_min', y='tasa_rellamada', color='nivel_experiencia',
+                                     hover_name='nombre_agente', size='total_llamadas',
+                                     title="Matriz: TMO vs Tasa de Re-llamadas",
+                                     labels={'tmo_promedio_min': 'TMO Promedio (Minutos)', 'tasa_rellamada': '% Re-llamadas'},
+                                     template="plotly_white")
+            # Añadir líneas promedio para crear cuadrantes
+            fig_scatter.add_hline(y=df_agentes['tasa_rellamada'].mean(), line_dash="dot", line_color="red", annotation_text="Promedio Re-llamadas")
+            fig_scatter.add_vline(x=df_agentes['tmo_promedio_min'].mean(), line_dash="dot", line_color="blue", annotation_text="Promedio TMO")
+            st.plotly_chart(fig_scatter, use_container_width=True)
+            
+        with c6:
+            # Ranking de los peores (Top 10)
+            df_peores = df_agentes.sort_values('tasa_rellamada', ascending=False).head(10)
+            fig_ranking = px.bar(df_peores, x='tasa_rellamada', y='nombre_agente', color='nivel_experiencia',
+                                 orientation='h', title="Top 10 Asesores Críticos (% Reincidencia)",
+                                 template="plotly_white", text_auto='.1f')
+            fig_ranking.update_layout(yaxis={'categoryorder':'total ascending'})
+            st.plotly_chart(fig_ranking, use_container_width=True)
+
+    with tab4:
         st.dataframe(df_filtrado.sort_values('fecha_hora', ascending=False).head(500), use_container_width=True)
