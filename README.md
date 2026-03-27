@@ -25,3 +25,5 @@ El proyecto integra un flujo de trabajo completo de análisis de datos:
 * `proyecto_tic.db`: Base de datos relacional (SQLite) que contiene las tablas `Fact_Interacciones`, `Dim_Usuarios`, `Dim_Agentes` y `Dim_Tipo_Incidencia`.
 * `requirements.txt`: Archivo de dependencias necesarias para el despliegue en Streamlit Community Cloud.
 * `README.md`: Documentación principal del proyecto.
+
+link del tablero: https://gujkjps22j9cgpjaueht8o.streamlit.app/
