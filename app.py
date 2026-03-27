@@ -2,28 +2,35 @@ import streamlit as st
 import pandas as pd
 import sqlite3
 import plotly.express as px
-import plotly.graph_objects as go
 
-# 1. Configuración de página (Más ancha y con ícono)
-st.set_page_config(page_title="Dashboard Operativo TIC", layout="wide", page_icon="🚀")
+# -------------------------------------------------------------------------
+# 1. CONFIGURACIÓN DE PÁGINA Y ESTILOS
+# -------------------------------------------------------------------------
+st.set_page_config(page_title="Control Tower - TIC", layout="wide", page_icon="📡")
 
-# CSS Personalizado para darle un toque premium a los KPIs
+# Inyectar CSS personalizado para mejorar el diseño de las métricas
 st.markdown("""
 <style>
-    div[data-testid="metric-container"] {
-        background-color: #f8f9fa;
-        border: 1px solid #e9ecef;
-        padding: 5% 10% 5% 10%;
+    .metric-card {
+        background-color: #ffffff;
         border-radius: 10px;
-        box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-left: 5px solid #1f77b4;
     }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("📊 Análisis de Comportamiento y Re-llamadas (TIC)")
+# Banner de imagen superior (usando una imagen pública de Unsplash para darle un toque pro)
+st.image("https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2000&q=80", use_container_width=True)
+
+st.title("📡 Control Tower: Análisis de Reincidencia TIC")
+st.markdown("Plataforma interactiva para el monitoreo de resolución en primer contacto (FCR) y comportamiento de re-llamadas. Proyecto Final Talento Tech.")
 st.markdown("---")
 
-# 2. Carga de datos
+# -------------------------------------------------------------------------
+# 2. CARGA Y PREPARACIÓN DE DATOS
+# -------------------------------------------------------------------------
 @st.cache_data
 def load_data():
     conn = sqlite3.connect('proyecto_tic.db')
@@ -45,66 +52,104 @@ def load_data():
     """
     df = pd.read_sql_query(query, conn)
     conn.close()
+    
+    # Asegurar formato de fecha para gráficas temporales
+    df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
+    df['fecha_dia'] = df['fecha_hora'].dt.date
     return df
 
 df = load_data()
 
-# 3. Barra lateral de Filtros
-st.sidebar.image("https://cdn-icons-png.flaticon.com/512/2043/2043064.png", width=100)
-st.sidebar.header("Filtros Dinámicos")
+# -------------------------------------------------------------------------
+# 3. BARRA LATERAL (SIDEBAR) - FILTROS AVANZADOS
+# -------------------------------------------------------------------------
+st.sidebar.image("https://cdn-icons-png.flaticon.com/512/8633/8633190.png", width=120)
+st.sidebar.header("🎯 Segmentación Dinámica")
+st.sidebar.markdown("Usa estos filtros para explorar distintos escenarios.")
 
-turnos_seleccionados = st.sidebar.multiselect("Filtrar por Turno:", options=df['turno'].unique(), default=df['turno'].unique())
-planes_seleccionados = st.sidebar.multiselect("Filtrar por Plan:", options=df['plan_servicio'].unique(), default=df['plan_servicio'].unique())
+# Multiselects
+turnos = st.sidebar.multiselect("⌚ Turno Operativo:", options=df['turno'].unique(), default=df['turno'].unique())
+experiencia = st.sidebar.multiselect("🎖️ Nivel de Experiencia:", options=df['nivel_experiencia'].unique(), default=df['nivel_experiencia'].unique())
+prioridad = st.sidebar.multiselect("🚨 Prioridad del Caso:", options=df['prioridad'].unique(), default=df['prioridad'].unique())
+segmentos = st.sidebar.multiselect("📊 Segmento Operativo:", options=df['segmento_operativo'].unique(), default=df['segmento_operativo'].unique())
 
-df_filtrado = df[(df['turno'].isin(turnos_seleccionados)) & (df['plan_servicio'].isin(planes_seleccionados))]
+# Aplicar todos los filtros al DataFrame
+df_filtrado = df[
+    (df['turno'].isin(turnos)) & 
+    (df['nivel_experiencia'].isin(experiencia)) & 
+    (df['prioridad'].isin(prioridad)) &
+    (df['segmento_operativo'].isin(segmentos))
+]
 
-# 4. KPIs Principales
-col1, col2, col3, col4 = st.columns(4)
-tasa_re = (df_filtrado['es_rellamada'].sum() / len(df_filtrado)) * 100 if len(df_filtrado) > 0 else 0
+# -------------------------------------------------------------------------
+# 4. KPIs PRINCIPALES (Tarjetas)
+# -------------------------------------------------------------------------
+if len(df_filtrado) == 0:
+    st.warning("⚠️ No hay datos para los filtros seleccionados. Por favor ajusta tu búsqueda.")
+else:
+    col1, col2, col3, col4 = st.columns(4)
+    
+    total_casos = len(df_filtrado)
+    tasa_re = (df_filtrado['es_rellamada'].sum() / total_casos) * 100
+    tmo_prom = df_filtrado['duracion_segundos'].mean() / 60
+    fcr_pct = (df_filtrado['resuelta_en_primera_llamada'].sum() / total_casos) * 100
 
-with col1:
-    st.metric("📞 Interacciones Totales", f"{len(df_filtrado):,}")
-with col2:
-    st.metric("⚠️ Tasa de Reincidencia", f"{tasa_re:.1f}%")
-with col3:
-    st.metric("⏱️ TMO Promedio", f"{df_filtrado['duracion_segundos'].mean()/60:.1f} min")
-with col4:
-    st.metric("✅ FCR (Primer Contacto)", f"{df_filtrado['resuelta_en_primera_llamada'].sum():,}")
+    col1.metric("📞 Interacciones Atendidas", f"{total_casos:,}", "Volumen total")
+    col2.metric("⚠️ Tasa de Reincidencia", f"{tasa_re:.1f}%", "- Objetivo: < 15%", delta_color="inverse")
+    col3.metric("⏱️ TMO Promedio", f"{tmo_prom:.1f} min", "Tiempo de operación")
+    col4.metric("✅ Resolución 1er Contacto", f"{fcr_pct:.1f}%", "+ Objetivo: > 70%")
 
-st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
-# 5. Pestañas de Navegación (Tabs)
-tab1, tab2, tab3 = st.tabs(["📈 Análisis General", "👥 Agentes y Turnos", "📋 Detalle de Datos"])
+    # -------------------------------------------------------------------------
+    # 5. TABS DE ANÁLISIS (Pestañas organizadas)
+    # -------------------------------------------------------------------------
+    tab1, tab2, tab3 = st.tabs(["📈 Análisis de Reincidencia", "👥 Rendimiento Operativo", "📋 Base de Datos"])
 
-with tab1:
-    c1, c2 = st.columns(2)
-    with c1:
-        # Gráfico de Barras interactivo
-        df_rellamadas = df_filtrado[df_filtrado['es_rellamada'] == 1]
-        fig1 = px.histogram(df_rellamadas, y='categoria', color='categoria', 
-                            title="Volumen de Re-llamadas por Categoría",
-                            template="plotly_white", text_auto=True).update_yaxes(categoryorder="total ascending")
-        st.plotly_chart(fig1, use_container_width=True)
-    with c2:
-        # Gráfico Donut
-        fig2 = px.pie(df_filtrado, names='segmento_operativo', title="Distribución por Segmento Operativo", 
-                      hole=0.4, template="plotly_white")
-        st.plotly_chart(fig2, use_container_width=True)
+    with tab1:
+        st.subheader("Drivers de Re-llamadas")
+        c1, c2 = st.columns(2)
+        
+        with c1:
+            # Gráfico de Barras: Volumen por Categoría
+            df_re = df_filtrado[df_filtrado['es_rellamada'] == 1]
+            fig1 = px.histogram(df_re, y='categoria', color='prioridad', 
+                                title="Volumen de Re-llamadas por Categoría y Prioridad",
+                                template="plotly_white", barmode='stack')
+            fig1.update_layout(yaxis={'categoryorder':'total ascending'})
+            st.plotly_chart(fig1, use_container_width=True)
+            
+        with c2:
+            # Heatmap de Riesgo (Cruce de Prioridad vs Experiencia)
+            matriz_riesgo = df_filtrado.pivot_table(index='prioridad', columns='nivel_experiencia', 
+                                                    values='es_rellamada', aggfunc='mean') * 100
+            fig2 = px.imshow(matriz_riesgo, text_auto=".1f", aspect="auto", color_continuous_scale='Reds',
+                             title="Matriz de Riesgo: % Reincidencia (Prioridad vs Experiencia)")
+            st.plotly_chart(fig2, use_container_width=True)
 
-with tab2:
-    c3, c4 = st.columns(2)
-    with c3:
-        # Gráfico de Caja (Boxplot)
-        fig3 = px.box(df_filtrado, x='turno', y='duracion_segundos', color='nivel_experiencia',
-                      title="Dispersión del TMO por Turno y Experiencia", template="plotly_white")
+        # Gráfico de Línea: Evolución temporal
+        df_tendencia = df_filtrado.groupby('fecha_dia')['es_rellamada'].sum().reset_index()
+        fig3 = px.line(df_tendencia, x='fecha_dia', y='es_rellamada', markers=True, 
+                       title="Evolución Temporal de Re-llamadas Diarias", template="plotly_white", color_discrete_sequence=['#e63946'])
         st.plotly_chart(fig3, use_container_width=True)
-    with c4:
-        # Gráfico de Barras Apiladas
-        fig4 = px.histogram(df_filtrado, x='nivel_experiencia', color='es_rellamada', barmode='group',
-                            title="Impacto de la Experiencia en la Reincidencia",
-                            labels={'es_rellamada': 'Es Re-llamada'}, template="plotly_white")
-        st.plotly_chart(fig4, use_container_width=True)
 
-with tab3:
-    st.subheader("Base de Datos Exploratoria")
-    st.dataframe(df_filtrado.sort_values('fecha_hora', ascending=False).head(100), use_container_width=True)
+    with tab2:
+        st.subheader("Análisis de Tiempos y Esfuerzo")
+        c3, c4 = st.columns(2)
+        
+        with c3:
+            # Boxplot de TMO
+            fig4 = px.box(df_filtrado, x='segmento_operativo', y='duracion_segundos', color='turno',
+                          title="Dispersión del TMO por Segmento Operativo", template="plotly_white")
+            st.plotly_chart(fig4, use_container_width=True)
+            
+        with c4:
+            # Pie chart: Distribución de esfuerzo
+            fig5 = px.pie(df_filtrado, names='plan_servicio', values='duracion_segundos', 
+                          title="Tiempo Total Invertido por Plan de Servicio", hole=0.3, template="plotly_white")
+            st.plotly_chart(fig5, use_container_width=True)
+
+    with tab3:
+        st.subheader("Extracción de Datos")
+        st.markdown("Visualiza y descarga el dataset consolidado basado en los filtros aplicados.")
+        st.dataframe(df_filtrado.sort_values('fecha_hora', ascending=False), use_container_width=True)
