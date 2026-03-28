@@ -1,4 +1,13 @@
 # 📡 Control Tower: Análisis de Reincidencia y Comportamiento (TIC)
+Una aplicación web interactiva construida con **Streamlit** para visualizar y analizar el dataset de Uber extraído de una base de datos SQL.
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
+![Plotly](https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white)
+![Kaggle](https://img.shields.io/badge/Kaggle-20BEFF?style=for-the-badge&logo=kaggle&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+
 
 Este repositorio contiene el código fuente y la base de datos para el Proyecto Final del Nivel Integrador del bootcamp Talento Tech. El proyecto se enfoca en la línea de investigación de Tecnologías de la Información y la Comunicación (TIC), resolviendo un desafío analítico común en operaciones de atención al usuario.
 
