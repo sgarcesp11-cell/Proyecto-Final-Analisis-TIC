@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto Integrador TIC - Control Tower</title>
+    <title>Proyecto Final TIC - Análisis de Re-llamadas</title>
     <style>
         :root {
             --primary-color: #1f77b4;
             --secondary-color: #2c3e50;
-            --bg-color: #f4f7f6;
+            --accent-color: #e74c3c;
+            --bg-color: #f8f9fa;
             --text-color: #333;
         }
         body {
@@ -22,141 +23,198 @@
         header {
             background-color: var(--secondary-color);
             color: white;
-            padding: 3rem 20px;
+            padding: 4rem 20px;
             text-align: center;
         }
         header h1 {
             margin: 0;
-            font-size: 2.5rem;
+            font-size: 2.8rem;
+            letter-spacing: 1px;
         }
         header p {
-            font-size: 1.2rem;
-            margin-top: 10px;
+            font-size: 1.3rem;
+            margin-top: 15px;
             opacity: 0.9;
         }
         .container {
-            max-width: 1000px;
-            margin: 40px auto;
+            max-width: 1100px;
+            margin: -40px auto 40px auto;
             padding: 0 20px;
+            position: relative;
+        }
+        .cta-section {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        .cta-section p {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 16px 35px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(31, 119, 180, 0.4);
+            display: inline-block;
+        }
+        .btn-primary:hover {
+            background-color: #155a8a;
+            transform: translateY(-2px);
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
         }
         .card {
             background: white;
             border-radius: 8px;
             padding: 30px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
+            border-top: 4px solid var(--primary-color);
         }
-        .cta-section {
-            text-align: center;
-            margin: 50px 0;
-        }
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 15px 30px;
-            text-decoration: none;
-            font-size: 1.2rem;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 4px 6px rgba(31, 119, 180, 0.3);
-        }
-        .btn-primary:hover {
-            background-color: #155a8a;
-        }
-        h2 {
+        .card h2 {
             color: var(--secondary-color);
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            display: inline-block;
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+        .highlight-box {
+            background-color: #eef2f5;
+            padding: 15px;
+            border-left: 4px solid var(--accent-color);
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        ul.custom-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        ul.custom-list li {
+            margin-bottom: 15px;
+            padding-left: 25px;
+            position: relative;
+        }
+        ul.custom-list li::before {
+            content: "✓";
+            color: var(--primary-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
         }
         .team-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 15px;
             margin-top: 20px;
+            justify-content: center;
         }
         .team-member {
-            background: #e9ecef;
-            padding: 15px;
-            border-radius: 5px;
-            flex: 1 1 calc(33.333% - 20px);
-            min-width: 200px;
-        }
-        .team-member strong {
-            display: block;
-            color: var(--primary-color);
+            background: var(--secondary-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-weight: 500;
             font-size: 1.1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .stack-tags span {
+            display: inline-block;
+            background: #e1e8ed;
+            color: #333;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin: 5px 5px 0 0;
+            font-weight: 600;
         }
         footer {
             text-align: center;
-            padding: 20px;
+            padding: 30px;
             background-color: var(--secondary-color);
             color: white;
-            margin-top: 40px;
+            margin-top: 50px;
+        }
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Control Tower: Análisis de Reincidencia TIC 📡</h1>
-        <p>Proyecto Final - Nivel Integrador | Talento Tech</p>
+        <h1>Análisis de Re-llamadas TIC 📡</h1>
+        <p>Plataformas de Atención al Cliente | Talento Tech - Nivel Integrador</p>
     </header>
 
     <div class="container">
         
         <div class="cta-section">
-            <p style="font-size: 1.2rem; margin-bottom: 20px;">Explora nuestra solución analítica en tiempo real.</p>
-            <a href="[https://gujkjps22j9cgpjaueht8o.streamlit.app/]" target="_blank" class="btn-primary">📊 Ir al Dashboard Interactivo</a>
+            <h2>Control Tower Interactiva</h2>
+            <p>Explora la herramienta dinámica que procesa <strong>25.000 interacciones</strong> mediante segmentación operativa, mapas de calor y KPIs en tiempo real.</p>
+            <a href="https://gujkjps22j9cgpjaueht8o.streamlit.app" target="_blank" class="btn-primary">📊 Abrir Dashboard Oficial</a>
         </div>
 
-        <div class="card">
-            <h2>El Desafío del Negocio</h2>
-            <p>En el sector de servicios BPO, el alto volumen de <strong>re-llamadas (reincidencia)</strong> es uno de los problemas más costosos. Cuando un usuario no obtiene una solución en su primer contacto, la empresa invierte el doble de recursos y la experiencia del cliente se degrada significativamente.</p>
-            <p>Este proyecto migra del reporte tradicional a la analítica descriptiva avanzada. Integramos y analizamos <strong>25,000 registros históricos</strong> para descubrir las fallas en la Resolución en el Primer Contacto (FCR).</p>
-        </div>
+        <div class="grid-2">
+            <div class="card">
+                <h2>⚠ La Problemática</h2>
+                <p>Una <strong>re-llamada</strong> ocurre cuando un usuario contacta nuevamente por el mismo problema no resuelto en la primera interacción. Esto impacta drásticamente en:</p>
+                <ul class="custom-list">
+                    <li>La degradación de la experiencia del usuario.</li>
+                    <li>El incremento de los costos operativos.</li>
+                    <li>El incumplimiento de los indicadores KPI (como el FCR).</li>
+                </ul>
+                <div class="highlight-box">
+                    <strong>Nuestro Enfoque:</strong> Utilizar bases de datos y técnicas de análisis para identificar patrones de reincidencia y orientar estratégicamente la capacitación en el sector BPO.
+                </div>
+            </div>
 
-        <div class="card">
-            <h2>Metodología y Tecnologías</h2>
-            <ul>
-                <li><strong>Ingeniería de Datos:</strong> Diseño de un Modelo de Estrella en <code>SQLite</code> y generación de un entorno de pruebas simulado con <code>Python</code>.</li>
-                <li><strong>Extracción de Conocimiento:</strong> Procesamiento matemático y segmentación mediante sentencias analíticas complejas en <code>SQL</code> (CTEs, funciones de agregación, JOINs).</li>
-                <li><strong>Visualización:</strong> Despliegue en la nube de un tablero de control (Dashboard) utilizando <code>Streamlit</code> y <code>Plotly</code> para identificar patrones críticos mediante mapas de calor y análisis de Pareto.</li>
-            </ul>
-        </div>
-
-        <div class="card">
-            <h2>Equipo Desarrollador</h2>
-            <div class="team-grid">
-                <div class="team-member">
-                    <strong>Santiago Garces</strong>
-                    Data Analyst / BI
-                </div>
-                <div class="team-member">
-                    <strong>[Nombre 2]</strong>
-                    Data Engineer
-                </div>
-                <div class="team-member">
-                    <strong>[Nombre 3]</strong>
-                    SQL Developer
-                </div>
-                <div class="team-member">
-                    <strong>[Nombre 4]</strong>
-                    Data Visualization
-                </div>
-                <div class="team-member">
-                    <strong>[Nombre 5]</strong>
-                    Project Manager
+            <div class="card">
+                <h2>🎯 Objetivos del Proyecto</h2>
+                <ul class="custom-list">
+                    <li><strong>01. Diseñar:</strong> Arquitectura de Base de Datos relacional bajo el modelo <em>Star Schema</em> (200 usuarios, 30 agentes).</li>
+                    <li><strong>02. Poblar:</strong> Generación de 25.000 interacciones históricas simulando el año 2025.</li>
+                    <li><strong>03. Analizar:</strong> Extracción mediante consultas SQL (JOINs, CTEs y funciones agregadas).</li>
+                    <li><strong>04. Visualizar:</strong> Despliegue del Dashboard interactivo en la nube.</li>
+                </ul>
+                <div class="stack-tags" style="margin-top: 20px;">
+                    <strong>Stack Tecnológico:</strong><br>
+                    <span>Streamlit</span> <span>Plotly</span> <span>Pandas</span> <span>SQLite</span> <span>Python</span>
                 </div>
             </div>
         </div>
 
-    </div>
+        <div class="card" style="border-top-color: var(--accent-color);">
+            <h2>💡 Hallazgos e Impacto del Análisis (Insights)</h2>
+            <div class="grid-2" style="margin-bottom: 0;">
+                <div>
+                    <ul class="custom-list">
+                        <li><strong>📉 ~35% Tasa de Reincidencia:</strong> Los agentes Junior presentan la mayor tasa de re-llamadas, evidenciando necesidad de capacitación técnica focalizada.</li>
+                        <li><strong>🔧 #1 Soporte Técnico:</strong> Categoría con mayor volumen de re-llamadas, especialmente en caídas de internet y configuraciones de red.</li>
+                    </ul>
+                </div>
+                <div>
+                    <ul class="custom-list">
+                        <li><strong>🌙 Noche (Turno Crítico):</strong> El turno nocturno muestra el menor porcentaje de resolución en primera llamada (FCR).</li>
+                        <li><strong>👤 Top 5 Usuarios Críticos:</strong> La segmentación permitió aislar a los clientes recurrentes para tomar acciones proactivas de retención.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
-    <footer>
-        <p>Desarrollado en Manizales, Colombia. © 2026</p>
-    </footer>
-
-</body>
-</html>
+        <div class="card">
+            <h2 style="text-align: center; border-bottom: none;">Equipo de Trabajo</h2>
+            <div class="team-grid">
+                <div class="team-member">Santiago Garcés</div>
+                <div class="team-member">Yorleidys Osorio Contreras</div>
+                <div class="team-member">Karoly Arrubla Rojas</div>
