@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto Integrador TIC - Control Tower</title>
+    <style>
+        :root {
+            --primary-color: #1f77b4;
+            --secondary-color: #2c3e50;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        header {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 3rem 20px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        header p {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        .cta-section {
+            text-align: center;
+            margin: 50px 0;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 6px rgba(31, 119, 180, 0.3);
+        }
+        .btn-primary:hover {
+            background-color: #155a8a;
+        }
+        h2 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        .team-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .team-member {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            flex: 1 1 calc(33.333% - 20px);
+            min-width: 200px;
+        }
+        .team-member strong {
+            display: block;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Control Tower: Análisis de Reincidencia TIC 📡</h1>
+        <p>Proyecto Final - Nivel Integrador | Talento Tech</p>
+    </header>
+
+    <div class="container">
+        
+        <div class="cta-section">
+            <p style="font-size: 1.2rem; margin-bottom: 20px;">Explora nuestra solución analítica en tiempo real.</p>
+            <a href="[https://gujkjps22j9cgpjaueht8o.streamlit.app/]" target="_blank" class="btn-primary">📊 Ir al Dashboard Interactivo</a>
+        </div>
+
+        <div class="card">
+            <h2>El Desafío del Negocio</h2>
+            <p>En el sector de servicios BPO, el alto volumen de <strong>re-llamadas (reincidencia)</strong> es uno de los problemas más costosos. Cuando un usuario no obtiene una solución en su primer contacto, la empresa invierte el doble de recursos y la experiencia del cliente se degrada significativamente.</p>
+            <p>Este proyecto migra del reporte tradicional a la analítica descriptiva avanzada. Integramos y analizamos <strong>25,000 registros históricos</strong> para descubrir las fallas en la Resolución en el Primer Contacto (FCR).</p>
+        </div>
+
+        <div class="card">
+            <h2>Metodología y Tecnologías</h2>
+            <ul>
+                <li><strong>Ingeniería de Datos:</strong> Diseño de un Modelo de Estrella en <code>SQLite</code> y generación de un entorno de pruebas simulado con <code>Python</code>.</li>
+                <li><strong>Extracción de Conocimiento:</strong> Procesamiento matemático y segmentación mediante sentencias analíticas complejas en <code>SQL</code> (CTEs, funciones de agregación, JOINs).</li>
+                <li><strong>Visualización:</strong> Despliegue en la nube de un tablero de control (Dashboard) utilizando <code>Streamlit</code> y <code>Plotly</code> para identificar patrones críticos mediante mapas de calor y análisis de Pareto.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Equipo Desarrollador</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <strong>Santiago Garces</strong>
+                    Data Analyst / BI
+                </div>
+                <div class="team-member">
+                    <strong>[Nombre 2]</strong>
+                    Data Engineer
+                </div>
+                <div class="team-member">
+                    <strong>[Nombre 3]</strong>
+                    SQL Developer
+                </div>
+                <div class="team-member">
+                    <strong>[Nombre 4]</strong>
+                    Data Visualization
+                </div>
+                <div class="team-member">
+                    <strong>[Nombre 5]</strong>
+                    Project Manager
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>Desarrollado en Manizales, Colombia. © 2026</p>
+    </footer>
+
+</body>
+</html>
